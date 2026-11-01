@@ -1,0 +1,9 @@
+order_id;customer;price;quantity
+001;Alice;15;2
+002;Bob;20;1
+002;Bob;20;1
+003;Charlie;;3
+004;Dina;23;1
+005;Ece;26;2
+006;Frank;750;1
+007;Gina;22;

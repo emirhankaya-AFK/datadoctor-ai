@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DataDoctor · Data Quality Studio</title>
+  <style>
+    :root {color-scheme: dark;--bg:#0c1020;--panel:#151b2e;--panel2:#1b243a;--line:#2c3550;--text:#f3f6ff;--muted:#a8b2cc;--mint:#71e4c3;--violet:#a394fa;--amber:#ffcd86}
+    * {box-sizing:border-box} body{margin:0;background:radial-gradient(ellipse at 12% 0%,#1a2641 0%,var(--bg) 50%);color:var(--text);font:15px/1.55 system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+    main{width:min(1080px,94vw);margin:auto;padding:26px 0 80px} header{display:flex;align-items:center;justify-content:space-between;margin-bottom:44px;gap:12px;flex-wrap:wrap}
+    .brand{font-size:19px;font-weight:800;letter-spacing:-.6px}.brand i{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:12px;background:var(--mint);color:#0e1b23;font-style:normal;margin-right:6px}
+    .pill{border:1px solid #40536b;color:var(--mint);border-radius:99px;padding:7px 13px;font-size:12px}.eyebrow{color:var(--mint);font-size:12px;font-weight:750;text-transform:uppercase;letter-spacing:2px}
+    h1{font-size:clamp(36px,5vw,64px);letter-spacing:-2.6px;line-height:1.08;margin:15px 0 13px} .hero p{max-width:660px;color:var(--muted);font-size:17px;margin:0 0 31px}
+    .hero em{color:var(--mint);font-style:normal} .layout{display:grid;grid-template-columns:1.5fr 1fr;gap:19px}.card{border:1px solid var(--line);background:linear-gradient(160deg,var(--panel),#111729);border-radius:19px;padding:24px;box-shadow:0 12px 42px #0002}
+    h2{font-size:18px;margin:0 0 13px;letter-spacing:-.4px}.sub{font-size:13px;color:var(--muted)}.drop{border:1.5px dashed #546781;border-radius:15px;text-align:center;padding:42px 18px;cursor:pointer;transition:.15s;background:#111b2f}
+    .drop.drag{border-color:var(--mint);background:#15312f}.drop .symbol{font-size:36px;color:var(--mint)}.drop strong{display:block;margin-top:5px;font-size:17px}.drop small{display:block;color:var(--muted);margin-top:8px}input[type=file]{display:none}
+    button{border:0;border-radius:11px;padding:12px 20px;font:inherit;font-weight:700;cursor:pointer;transition:.15s}button:disabled{opacity:.45;cursor:not-allowed}.primary{background:var(--mint);color:#102027}.primary:hover:enabled{background:#a1f1da}.secondary{background:#303b57;color:#fff}.secondary:hover:enabled{background:#405475}
+    .actions{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap}.fileinfo{margin-top:11px;font-size:13px;color:var(--mint);min-height:21px;overflow-wrap:anywhere}
+    .switch{display:flex;align-items:center;gap:10px;margin:15px 0;color:#dfe4f5;font-size:14px}.switch input{accent-color:#71e4c3;width:16px;height:16px}
+    select{border:1px solid #4a5977;background:#1e2940;color:var(--text);border-radius:9px;padding:8px;width:100%;margin-top:8px;font:inherit}
+    .statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin:20px 0}.stat{border:1px solid var(--line);background:#161f35;padding:18px;border-radius:14px}.stat b{display:block;font-size:28px;letter-spacing:-1px}.stat span{font-size:12px;color:var(--muted)}
+    .result{margin-top:26px;display:none}.result.visible{display:block}.tablewrap{width:100%;overflow:auto;border-radius:13px;border:1px solid var(--line)}table{border-collapse:collapse;width:100%;font-size:13px;text-align:left;white-space:nowrap}th{background:#243049;color:#e3ecff}th,td{padding:12px 13px;border-bottom:1px solid #303a53}tr:last-child td{border:0}
+    .message{margin-top:12px;color:var(--amber);font-size:13px;min-height:22px}.hint{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:17px;margin-top:20px}
+    .topline{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px}.status{font-size:12px;color:var(--mint)}footer{margin-top:35px;color:#7e8aa7;font-size:12px}
+    @media(max-width:750px){.layout{grid-template-columns:1fr}.statgrid{grid-template-columns:repeat(2,1fr)}.card{padding:17px}header{margin-bottom:26px}}
+  </style>
+</head>
+<body><main>
+  <header><div class="brand"><i>✳</i> DataDoctor <span style="font-weight:400;color:#a4afc9">/ Studio</span></div><span class="pill">● Local-first · Open source</span></header>
+  <section class="hero"><div class="eyebrow">Data quality made simple</div><h1>Healthy data.<br><em>Better decisions.</em></h1><p>Drop in a CSV or Excel file. Spot missing values, duplicates and unusual numbers. Export a cleaned version in seconds, with no paid APIs.</p></section>
+  <section class="layout">
+    <div class="card"><h2>01 / Upload your dataset</h2><p class="sub">Files are processed locally by this server. Only anonymous run counts go into SQLite.</p>
+      <div class="drop" id="drop" tabindex="0" role="button" aria-label="Select CSV or Excel file"><div class="symbol">⇧</div><strong>Drop your file here</strong><span>or click to browse</span><small>CSV · XLSX · 10 MiB maximum · up to 100,000 rows</small></div>
+      <input type="file" id="file" accept=".csv,.xlsx" /><div class="fileinfo" id="fileinfo"></div>
+      <div class="actions"><button class="primary" id="analyze" disabled>Analyze data →</button><span class="sub" id="progress" role="status"></span></div><div class="message" id="message" role="alert"></div>
+    </div>
+    <div class="card"><h2>02 / Choose cleaning rules</h2><p class="sub">Preview the issues first. Changes only apply to the downloaded copy.</p>
+      <label class="switch"><input type="checkbox" id="dedupe" checked /> Remove duplicate rows</label>
+      <label class="switch"><input type="checkbox" id="cap" /> Cap numeric outliers (1.5 × IQR)</label>
+      <label style="display:block;margin:21px 0 15px">Missing value policy<select id="missing"><option value="none">Leave missing values unchanged</option><option value="fill">Fill numeric median / text mode</option><option value="drop_rows">Drop rows with missing values</option></select></label>
+      <button id="download" class="secondary" disabled>↓ Download cleaned file</button>
+      <p class="hint">Outlier caps and missing-value replacements can change interpretations. Download only after reviewing the analysis. No cloud database is required.</p>
+    </div>
+  </section>
+  <section id="result" class="result" aria-live="polite">
+    <div class="topline"><h2>03 / Quality report</h2><span id="qualityLabel" class="status"></span></div>
+    <div class="statgrid" id="stats"></div>
+    <div class="card"><h2>Column health</h2><div class="tablewrap"><table><thead><tr><th>Column</th><th>Type</th><th>Missing</th><th>Unique</th><th>Outliers</th></tr></thead><tbody id="columns"></tbody></table></div></div>
+    <div class="card" style="margin-top:16px"><h2>Data preview · first 8 rows</h2><div class="tablewrap" id="preview"></div></div>
+  </section><footer>DataDoctor 1.0 · No AI API fees · Built with FastAPI + pandas · <a href="/docs" style="color:var(--mint)">API docs</a></footer>
+</main>
+<script>
+  const $ = x => document.getElementById(x);
+  let selected = null;
+  const esc = x => String(x ?? '—').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  function choose(f) { selected=f; $('fileinfo').textContent=f ? `${f.name} · ${(f.size/1024).toFixed(1)} KiB` : ''; $('analyze').disabled=!f; $('download').disabled=true; $('result').classList.remove('visible'); $('message').textContent=''; }
+  $('file').addEventListener('change',e=>choose(e.target.files[0]));
+  $('drop').addEventListener('click',()=>$('file').click());
+  $('drop').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('file').click();}});
+  for (const event of ['dragenter','dragover']) $('drop').addEventListener(event,e=>{e.preventDefault();$('drop').classList.add('drag')});
+  for (const event of ['dragleave','drop']) $('drop').addEventListener(event,e=>{e.preventDefault();$('drop').classList.remove('drag')});
+  $('drop').addEventListener('drop',e=>{ const f=e.dataTransfer.files[0]; if(f)choose(f) });
+  async function request(path, extra) {
+    const body = new FormData(); body.append('file',selected);
+    if(extra)Object.entries(extra).forEach(([k,v])=>body.append(k,String(v)));
+    const res=await fetch(path,{method:'POST',body});
+    if(!res.ok){let error='Unable to process file';try{error=(await res.json()).detail||error}catch{}throw Error(error)}
+    return res;
+  }
+  function stat(text,n){return `<div class="stat"><b>${esc(n)}</b><span>${esc(text)}</span></div>`}
+  $('analyze').addEventListener('click',async()=>{
+    $('analyze').disabled=true;$('progress').textContent='Analyzing…';$('message').textContent='';
+    try{
+      const report=await (await request('/api/analyze')).json(), s=report.summary;
+      $('stats').innerHTML=stat('Rows',s.rows.toLocaleString())+stat('Missing cells',s.missing_cells)+stat('Duplicate rows',s.duplicate_rows)+stat('Outlier cells',s.outlier_cells);
+      $('qualityLabel').textContent=`Heuristic quality score: ${s.quality_score}/100`;
+      $('columns').innerHTML=report.columns.map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.type)}</td><td>${esc(c.missing)} (${esc(c.missing_pct)}%)</td><td>${esc(c.unique)}</td><td>${esc(c.outliers)}</td></tr>`).join('');
+      const keys=report.columns.map(c=>c.name), rows=report.preview;
+      $('preview').innerHTML=`<table><thead><tr>${keys.map(k=>`<th>${esc(k)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${keys.map(k=>`<td>${esc(r[k])}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+      $('result').classList.add('visible'); $('download').disabled=false; $('result').scrollIntoView({behavior:'smooth',block:'start'});
+    }catch(err){$('message').textContent=err.message}finally{$('analyze').disabled=false;$('progress').textContent=''}
+  });
+  $('download').addEventListener('click',async()=>{
+    $('download').disabled=true;$('message').textContent='';$('progress').textContent='Cleaning…';
+    try{
+      const res=await request('/api/clean',{drop_duplicates:$('dedupe').checked,cap_outliers:$('cap').checked,missing_strategy:$('missing').value});
+      const blob=await res.blob(), href=URL.createObjectURL(blob), a=document.createElement('a');
+      a.href=href;a.download='datadoctor-cleaned'+(selected.name.toLowerCase().endsWith('.xlsx')?'.xlsx':'.csv');document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(href),5000);
+      $('message').textContent=`Exported · ${res.headers.get('X-DataDoctor-Removed-Duplicates')||0} duplicate rows removed, ${res.headers.get('X-DataDoctor-Filled-Cells')||0} missing cells filled.`;
+    }catch(err){$('message').textContent=err.message}finally{$('download').disabled=false;$('progress').textContent=''}
+  });
+</script></body></html>
