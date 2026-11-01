@@ -1,0 +1,23 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+*.egg-info/
+build/
+dist/
+.coverage
+.env
+/data/
+*.sqlite3
+*.db
+.DS_Store
+# Never accidentally commit user-supplied datasets or generated reports.
+*.csv
+*.xlsx
+*.xls
+*.json
+*.parquet
+*.log
+.env.*
+!examples/
+!examples/sample.csv
